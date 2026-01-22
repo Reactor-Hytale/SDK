@@ -13,7 +13,7 @@ import java.util.Map;
 @UtilityClass
 public final class TimeFormatter {
 
-    public static final Map<Character, Long> UNIT_MULTIPLIERS = new HashMap<>();
+    public static final Map<Character, Integer> UNIT_MULTIPLIERS = new HashMap<>();
 
     private record TimeUnit(char key, long millis) {
         private TimeUnit(char key, Duration millis) {
@@ -22,8 +22,7 @@ public final class TimeFormatter {
     }
 
     private static final TimeUnit[] UNITS = {
-        new TimeUnit('a', Duration.ofDays(365)),
-        new TimeUnit('M', Duration.ofDays(30)),
+        new TimeUnit('y', Duration.ofDays(365)),
         new TimeUnit('d', Duration.ofDays(1)),
         new TimeUnit('h', Duration.ofHours(1)),
         new TimeUnit('m', Duration.ofMinutes(1)),
@@ -31,14 +30,14 @@ public final class TimeFormatter {
     };
 
     static {
-        UNIT_MULTIPLIERS.put('s', 1L);           // Seconds
-        UNIT_MULTIPLIERS.put('m', 60L);          // Minutes
-        UNIT_MULTIPLIERS.put('h', 3600L);        // Hours
-        UNIT_MULTIPLIERS.put('d', 86400L);       // Days
-        UNIT_MULTIPLIERS.put('y', 86400L * 365); // Years
+        UNIT_MULTIPLIERS.put('s', 1);                  // Seconds
+        UNIT_MULTIPLIERS.put('m', 60);                 // Minutes
+        UNIT_MULTIPLIERS.put('h', 60 * 60);            // Hours
+        UNIT_MULTIPLIERS.put('d', 60 * 60 * 24);       // Days
+        UNIT_MULTIPLIERS.put('y', 60 * 60 * 24 * 365); // Years
     }
 
-    public static String formatSince(Instant instant, Instant since) {
+    public static String formatSince(@NotNull Instant instant, @NotNull Instant since) {
         return format(Duration.between(instant, since).getSeconds());
     }
 
@@ -94,11 +93,11 @@ public final class TimeFormatter {
         return result.toString();
     }
 
-    public static long convertToSecondsSupport(final @NotNull String timeParts) {
+    public static int convertToSeconds(final @NotNull String timeParts) {
         return convertToSeconds(Arrays.asList(timeParts.split(" ")));
     }
 
-    public static long convertToSecondsSupportPermanent(final @NotNull Collection<String> timeParts) {
+    public static int convertToSecondsSupportPermanent(final @NotNull Collection<String> timeParts) {
         for (final String part : timeParts) {
             if ("permanent".equalsIgnoreCase(part)) {
                 return -1;
@@ -107,20 +106,20 @@ public final class TimeFormatter {
         return convertToSeconds(timeParts);
     }
 
-    public static long convertToSeconds(final Collection<String> timeParts) {
-        long totalSeconds = 0;
+    public static int convertToSeconds(final @NotNull Collection<String> timeParts) {
+        int totalSeconds = 0;
 
         for (String part : timeParts) {
             if (part.length() < 2) {
                 throw new IllegalArgumentException("Invalid format: " + part);
             }
             char unit = part.charAt(part.length() - 1);
-            final long multiplier = UNIT_MULTIPLIERS.get(unit);
+            final int multiplier = UNIT_MULTIPLIERS.get(unit);
             if (multiplier == 0) {
                 throw new IllegalArgumentException("Invalid unit of time: " + unit);
             }
             try {
-                long value = Long.parseLong(part.substring(0, part.length() - 1));
+                int value = Integer.parseInt(part.substring(0, part.length() - 1));
                 totalSeconds += value * multiplier;
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("Invalid number in: " + part);
