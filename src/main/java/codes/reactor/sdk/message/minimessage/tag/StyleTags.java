@@ -2,6 +2,7 @@ package codes.reactor.sdk.message.minimessage.tag;
 
 import codes.reactor.sdk.message.ChatColor;
 import codes.reactor.sdk.message.minimessage.MiniMessage;
+import com.hypixel.hytale.server.core.Message;
 
 public final class StyleTags {
 
@@ -36,10 +37,17 @@ public final class StyleTags {
             true,
             "underlined", "u");
 
-        MiniMessage.registerTag( // Not native support by hytale
-            (component) -> component.color(ChatColor.WHITE.getName()),
-            (nextComponent) -> nextComponent.color(ChatColor.WHITE.getName()),
+        MiniMessage.registerTag(
+            StyleTags::resetComponent,
+            StyleTags::resetComponent,
             true,
             "reset", "r");
+    }
+
+    private static void resetComponent(Message component) {
+        component.color(ChatColor.WHITE.getHex());
+        component.italic(false);
+        component.bold(false);
+        component.monospace(false);
     }
 }

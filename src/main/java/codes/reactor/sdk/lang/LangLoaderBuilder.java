@@ -62,6 +62,7 @@ public class LangLoaderBuilder {
     }
 
     public LangLoader build(final ConfigServiceByContext configServiceByContext) {
+        final File folder = new File(langFolder);
         return new LangLoader(
             configServiceByContext.getContext().logger(),
             configServiceByContext,
@@ -70,7 +71,7 @@ public class LangLoaderBuilder {
             localeFunction,
             messageFunction,
 
-            new File(langFolder),
+            folder,
             defaultLangFile
         );
     }

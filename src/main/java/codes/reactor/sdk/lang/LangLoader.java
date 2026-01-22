@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.logging.Level;
 
 @RequiredArgsConstructor
 @Setter
@@ -30,14 +29,11 @@ public final class LangLoader {
     private final @NotNull Function<String, Message> messageFunction;
 
     private final @NotNull File folder;
-    private final @NotNull String defaultLangPath;
+    private final @NotNull String defaultLangFile;
 
     public MultiLang load() {
-        final String[] subFolders = defaultLangPath.split("/");
-        final String defaultLangName = subFolders[subFolders.length-1].split("\\.")[0];
-
         if (!folder.exists()) {
-            return createDefaultLang(folder, subFolders);
+            return createDefaultLang();
         }
 
         final Map<String, Lang> langMap = new HashMap<>();
@@ -55,9 +51,10 @@ public final class LangLoader {
             return emptyLang();
         }
 
+        final String defaultLangName = defaultLangFile.split("\\.")[0];
         Lang defaultLang = langMap.get(defaultLangName);
         if (defaultLang == null) {
-            logger.at(Level.WARNING).log("Can't found the default lang " + defaultLangName + ". Available Lang: " + langMap.keySet());
+            logger.atWarning().log("Can't found the default lang " + defaultLangName + ". Available Lang: " + langMap.keySet());
             defaultLang = langMap.values().iterator().next();
         }
         return new MultiLang(localeFunction, messageFunction, langMap, defaultLang);
@@ -65,9 +62,11 @@ public final class LangLoader {
 
     private void loadLangFile(File langFile, Map<String, Lang> langMap) {
         final String fileName = langFile.getName();
-        if (!fileName.endsWith(".yml") || !fileName.endsWith(".yaml")) {
-            logger.at(Level.WARNING).log("The lang file " + fileName + " isn't supported. Available file extensions: .yml and .yaml");
-            return;
+        for (final String fileExtension : configService.fileExtensions()) {
+            if (!fileName.endsWith(fileExtension)) {
+                logger.atWarning().log("The lang file " + fileName + " isn't supported. Available file extensions: " + configService.fileExtensions());
+                return;
+            }
         }
 
         final ConfigSection langConfig = configService.load(langFile.toPath());
@@ -82,17 +81,19 @@ public final class LangLoader {
         }
     }
 
-    private @NotNull MultiLang createDefaultLang(File outFolder, String[] subFolders) {
+    private @NotNull MultiLang createDefaultLang() {
         final ConfigSection defaultLangSection;
-        final File file = new File(outFolder, subFolders[subFolders.length - 1]);
+        final String resourcePath = folder.getName() + "/" + defaultLangFile;
+        final File outFile = new File(folder, defaultLangFile);
+
         try {
             if (configService instanceof ConfigServiceByContext byContext) {
-                defaultLangSection = byContext.createIfAbsentAndLoad(file.toString());
+                defaultLangSection = byContext.createIfAbsentAndLoad(resourcePath);
             } else {
-                defaultLangSection = configService.createIfAbsentAndLoad(file.toString(), classLoader);
+                defaultLangSection = configService.createIfAbsentAndLoad(resourcePath, classLoader);
             }
         } catch (IOException e) {
-            logger.at(Level.SEVERE).log("Error on create or load the file " + file, e);
+            logger.atSevere().withCause(e).log("Error on create or load the file " + outFile);
             return emptyLang();
         }
         return new MultiLang(localeFunction, messageFunction, new HashMap<>(), loadLang(defaultLangSection));

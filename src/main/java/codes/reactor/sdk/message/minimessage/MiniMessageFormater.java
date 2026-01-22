@@ -15,7 +15,7 @@ import java.util.Map;
 final class MiniMessageFormater {
 
     static List<Message> format(final String text, final Map<String, MiniTag> tags) {
-        final List<TagTokenizer.Token> tokens = TagTokenizer.tokenize(text);
+        final List<Token> tokens = TagTokenizer.tokenize(text);
         final List<Message> components = new ArrayList<>();
         final Deque<OpenTag> openTags = new ArrayDeque<>();
 
@@ -46,7 +46,7 @@ final class MiniMessageFormater {
             }
 
             messageTag.onClose(component);
-            closeTag(openTags, tagContent, component);
+            closeTag(openTags, tagContent);
         }
         return components;
     }
@@ -64,7 +64,7 @@ final class MiniMessageFormater {
         }
     }
 
-    private static void closeTag(final Deque<OpenTag> openTags, final String tagContent, final Message component) {
+    private static void closeTag(final Deque<OpenTag> openTags, final String tagContent) {
         final Iterator<OpenTag> iterator = openTags.iterator();
 
         while (iterator.hasNext()) {
@@ -75,7 +75,7 @@ final class MiniMessageFormater {
         }
     }
 
-    private static record OpenTag(
+    private record OpenTag(
         MiniTag tag,
         List<String> args
     ) {}

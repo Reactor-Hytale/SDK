@@ -66,7 +66,9 @@ public class ConfigServiceByContext implements ConfigService {
     public ConfigSection createIfAbsentAndLoad(final String fileName) throws IOException {
         final Path dest = directory.resolve(fileName);
         ensureParent(dest);
-        return service.createIfAbsentAndLoad(fileName, dest, context.classLoader());
+
+        String jarPath = fileName.replace('\\', '/');
+        return service.createIfAbsentAndLoad(jarPath, dest, context.classLoader());
     }
 
     @Override

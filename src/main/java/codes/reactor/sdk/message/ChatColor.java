@@ -3,6 +3,11 @@ package codes.reactor.sdk.message;
 import codes.reactor.sdk.message.util.ColorConverter;
 import com.hypixel.hytale.protocol.Color;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * The {@code ChatColor} class represents a color in a chat system.
@@ -23,47 +28,38 @@ public final class ChatColor {
         GRAY_TYPE = 3;
 
     public static final ChatColor
-        BLACK = new ChatColor('0', 0,0,0),
-        DARK_BLUE = new ChatColor('1', 0, 0, 170),
-        DARK_GREEN = new ChatColor('2', 0, 170, 0),
-        DARK_AQUA = new ChatColor('3', 0, 170, 170),
-        DARK_RED = new ChatColor('4', 170,0,0),
-        DARK_PURPLE = new ChatColor('5', 170, 0, 170),
-        GOLD = new ChatColor('6', 255, 170, 0),
-        GRAY = new ChatColor('7', 170, 170, 170),
-        DARK_GRAY = new ChatColor('8', 85, 85, 85),
-        BLUE = new ChatColor('9', 85, 85, 255),
-        GREEN = new ChatColor('a', 85, 255, 85),
-        AQUA = new ChatColor('b', 85, 255, 255),
-        RED = new ChatColor('c', 255,85,85),
-        LIGHT_PURPLE = new ChatColor('d', 255, 85, 255),
-        YELLOW = new ChatColor('e', 255, 255, 85),
-        WHITE = new ChatColor('f', 255, 255, 255);
+        BLACK = new ChatColor("black", '0', 0,0,0),
+        DARK_BLUE = new ChatColor("dark_blue", '1', 0, 0, 170),
+        DARK_GREEN = new ChatColor("dark_green", '2', 0, 170, 0),
+        DARK_AQUA = new ChatColor("dark_aqua", '3', 0, 170, 170),
+        DARK_RED = new ChatColor("dark_red", '4', 170,0,0),
+        DARK_PURPLE = new ChatColor("dark_purple", '5', 170, 0, 170),
+        GOLD = new ChatColor("gold", '6', 255, 170, 0),
+        GRAY = new ChatColor("gray", '7', 170, 170, 170),
+        DARK_GRAY = new ChatColor("dark_gray", '8', 85, 85, 85),
+        BLUE = new ChatColor("blue", '9', 85, 85, 255),
+        GREEN = new ChatColor("green", 'a', 85, 255, 85),
+        AQUA = new ChatColor("aqua", 'b', 85, 255, 255),
+        RED = new ChatColor("red", 'c', 255,85,85),
+        LIGHT_PURPLE = new ChatColor("light_purple", 'd', 255, 85, 255),
+        YELLOW = new ChatColor("yellow", 'e', 255, 255, 85),
+        WHITE = new ChatColor("white", 'f', 255, 255, 255);
 
-    public static final ChatColor[] LEGACY_COLORS = {
+    public static final Collection<ChatColor> LEGACY_COLORS = List.of(
         BLACK, DARK_BLUE, DARK_GREEN, DARK_AQUA, DARK_RED, DARK_PURPLE, GOLD,
         GRAY, DARK_GRAY, BLUE, GREEN, AQUA, RED, LIGHT_PURPLE, YELLOW, WHITE
-    };
+    );
 
     private final char code;
 
     private final int red, blue, green;
-    private final String name;
+    private final String hex;
 
-    /**
-     * Private constructor used to initialize predefined colors.
-     *
-     * @param code  The character code associated with the color.
-     * @param red   The red component of the color.
-     * @param green The green component of the color.
-     * @param blue  The blue component of the color.
-     */
-    private ChatColor(final char code, final int red, final int green, final int blue) {
-        this.name = String.format("#%02X%02X%02X", red, green, blue);
-        this.code = code;
-        this.red = red;
-        this.blue = blue;
-        this.green = green;
+    private @Nullable String legacyName;
+
+    private ChatColor(final @NotNull String legacyName, final char code, final int red, final int green, final int blue) {
+        this(red, green, blue, code);
+        this.legacyName = legacyName;
     }
 
     /**
@@ -75,7 +71,7 @@ public final class ChatColor {
      * @param code  The format code (e.g., RGB, HEX_CODE, etc.).
      */
     private ChatColor(int red, int green, int blue, char code) {
-        this.name = String.format("#%02X%02X%02X", red, green, blue);
+        this.hex = String.format("#%02X%02X%02X", red, green, blue);
         this.red = red;
         this.green = green;
         this.blue = blue;
@@ -142,7 +138,7 @@ public final class ChatColor {
             hex = hex.substring(1);
         }
         final int[] rgb = ColorConverter.hexToRGB(hex);
-        return new ChatColor(HEX_CODE, rgb[0], rgb[1], rgb[2]);
+        return new ChatColor(rgb[0], rgb[1], rgb[2], HEX_CODE);
     }
 
     /**
@@ -153,7 +149,7 @@ public final class ChatColor {
      */
     public static ChatColor hex(final String hex) {
         final int[] rgb = ColorConverter.hexToRGB(hex);
-        return new ChatColor(HEX_CODE, rgb[0], rgb[1], rgb[2]);
+        return new ChatColor(rgb[0], rgb[1], rgb[2], HEX_CODE);
     }
 
     /**
@@ -271,7 +267,7 @@ public final class ChatColor {
     public String toString() {
         return switch(code) {
             case RGB -> toRgb();
-            case HEX_CODE -> getName();
+            case HEX_CODE -> getHex();
             case CMYK -> toCymk();
             case GRAY_TYPE -> String.valueOf(red);
             default -> COLOR_CHAR + String.valueOf(code);
@@ -340,7 +336,7 @@ public final class ChatColor {
      * @return A string in the format "#RRGGBB".
      */
     public String toHex() {
-        return getName();
+        return getHex();
     }
 
     public static ChatColor approximateToLegacy(final ChatColor color) {
