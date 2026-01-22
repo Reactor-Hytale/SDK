@@ -12,19 +12,9 @@ public abstract class ReactorPlugin extends JavaPlugin {
         super(init);
         context = new PluginContext(
             getName(),
-            getFile(),
+            getDataDirectory(),
             getLogger(),
             getClassLoader()
         );
-    }
-
-    @Override
-    protected void shutdown() {
-        super.shutdown();
-    }
-
-    @Override
-    protected void shutdown0(final boolean shutdown) {
-        super.shutdown0(shutdown);
     }
 }
