@@ -1,0 +1,17 @@
+{
+    "Group": "codes.reactor.sdk",
+    "Name": "ReactorSDK",
+    "Version": "1.0.0",
+    "Description": "A utilities for make hytale plugin.",
+    "Authors": [
+        {
+            "Name": "Reactor"
+        }
+    ],
+    "Website": "https://reactor.codes",
+    "ServerVersion": "*",
+    "Dependencies": {},
+    "OptionalDependencies": {},
+    "DisabledByDefault": false,
+    "Main": "codes.reactor.sdk.ReactorSDK"
+}

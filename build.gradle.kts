@@ -34,6 +34,7 @@ dependencies {
     testRuntimeOnly(files(hytaleServerJar))
 
     implementation("org.snakeyaml:snakeyaml-engine:3.0.1")
+    implementation("org.mongodb:mongodb-driver-sync:5.6.2")
 }
 
 tasks.withType<JavaCompile>().configureEach {
