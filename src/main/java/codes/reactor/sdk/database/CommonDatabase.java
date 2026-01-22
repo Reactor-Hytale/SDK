@@ -32,7 +32,7 @@ public final class CommonDatabase {
 
     public static CommonDatabase getInstance() {
         if (instance == null) {
-            throw new IllegalStateException("RunithDatabaseAPI not initialized.");
+            throw new IllegalStateException("ReactorDatabaseAPI not initialized.");
         }
         return instance;
     }
