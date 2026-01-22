@@ -6,6 +6,9 @@ import codes.reactor.sdk.database.repository.ProviderBackedRepositoryProvider;
 import codes.reactor.sdk.database.repository.RepositoryFactory;
 import lombok.Getter;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public final class ReactorDatabase {
     private final DatabaseProvider provider;
 
@@ -13,15 +16,20 @@ public final class ReactorDatabase {
     private final RepositoryFactory repositoryFactory;
 
     private ReactorDatabase(DatabaseProvider provider) {
-        this.provider = provider;
-        this.repositoryFactory = new DefaultRepositoryFactory(new ProviderBackedRepositoryProvider(provider));
+        this(provider, Executors.newVirtualThreadPerTaskExecutor());
     }
 
-    public DatabaseContext getContext(String databaseName) {
-        return new DatabaseContext(databaseName);
+    public ReactorDatabase(DatabaseProvider provider, ExecutorService executorService) {
+        this.provider = provider;
+        this.repositoryFactory = new DefaultRepositoryFactory(new ProviderBackedRepositoryProvider(provider), executorService);
+    }
+
+    public DatabaseContext getContext(final String databaseName) {
+        return new DatabaseContext(databaseName, repositoryFactory);
     }
 
     public void shutdown() {
         provider.close();
+        repositoryFactory.getExecutor().close();
     }
 }

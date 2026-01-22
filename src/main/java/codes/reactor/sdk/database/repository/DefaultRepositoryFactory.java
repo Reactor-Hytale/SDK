@@ -3,20 +3,20 @@ package codes.reactor.sdk.database.repository;
 import codes.reactor.sdk.database.repository.async.AsyncRepository;
 import codes.reactor.sdk.database.repository.async.AsyncRepositoryWrapper;
 import codes.reactor.sdk.database.repository.sync.Repository;
-import lombok.Setter;
+import lombok.Getter;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public final class DefaultRepositoryFactory implements RepositoryFactory {
 
-    @Setter
-    private ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+    @Getter
+    private final ExecutorService executor;
 
     private final RepositoryProvider delegate;
 
-    public DefaultRepositoryFactory(RepositoryProvider delegate) {
+    public DefaultRepositoryFactory(RepositoryProvider delegate, ExecutorService executor) {
         this.delegate = delegate;
+        this.executor = executor;
     }
 
     @Override
@@ -30,8 +30,4 @@ public final class DefaultRepositoryFactory implements RepositoryFactory {
         return new AsyncRepositoryWrapper<>(syncRepo, executor);
     }
 
-    @Override
-    public ExecutorService getExecutor() {
-        return executor;
-    }
 }

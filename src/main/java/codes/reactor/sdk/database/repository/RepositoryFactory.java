@@ -11,7 +11,5 @@ public interface RepositoryFactory {
 
     <ID, T> AsyncRepository<ID, T> createAsync(Class<T> entityClass, String databaseName);
 
-    void setExecutor(ExecutorService executor);
-
     ExecutorService getExecutor();
 }
