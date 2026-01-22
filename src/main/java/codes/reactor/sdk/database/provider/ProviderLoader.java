@@ -1,7 +1,6 @@
-package codes.reactor.sdk.database;
+package codes.reactor.sdk.database.provider;
 
 import codes.reactor.sdk.config.section.ConfigSection;
-import codes.reactor.sdk.database.provider.DatabaseProvider;
 import codes.reactor.sdk.database.provider.gson.GsonDatabaseInitializer;
 import codes.reactor.sdk.database.provider.mongodb.MongoDBInitializer;
 import codes.reactor.sdk.database.provider.none.NoneDatabaseProvider;
