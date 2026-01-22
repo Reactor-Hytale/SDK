@@ -2,6 +2,7 @@ package codes.reactor.sdk.database.provider.mongodb;
 
 import codes.reactor.sdk.config.section.ConfigSection;
 import codes.reactor.sdk.database.provider.DatabaseProvider;
+import codes.reactor.sdk.util.TimeFormatter;
 import com.mongodb.*;
 import com.mongodb.client.MongoClients;
 import lombok.experimental.UtilityClass;
@@ -21,8 +22,8 @@ public final class MongoDBInitializer {
 
     public static DatabaseProvider init(final ConfigSection config) throws MongoClientException {
 
-        final int connectionTimeOut = Math.max(1, config.getInt("connect-timeout-seconds"));
-        final int readTimeOut = Math.max(1, config.getInt("read-timeout-seconds"));
+        final int connectionTimeOut = TimeFormatter.convertToSeconds(config.getOrDefault("connect-timeout-seconds", "5s"));
+        final int readTimeOut = TimeFormatter.convertToSeconds(config.getOrDefault("read-timeout-seconds", "5s"));
 
         final String uri = getUri(config);
         final ConnectionString connectionString = new ConnectionString(uri);
