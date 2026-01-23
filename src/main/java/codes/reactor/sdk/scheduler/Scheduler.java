@@ -1,12 +1,11 @@
 package codes.reactor.sdk.scheduler;
 
-
 import org.jetbrains.annotations.NotNull;
 
 /**
  * A tick-based scheduler for executing tasks at specific ticks or after delays.
  */
-interface Scheduler {
+public interface Scheduler {
 
     /**
      * Executes the task immediately in the current tick.
