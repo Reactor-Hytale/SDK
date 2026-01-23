@@ -1,17 +1,21 @@
 plugins {
     id("java")
     id("com.gradleup.shadow") version "9.3.0"
+    id("maven-publish")
 }
 
 group = "codes.reactor"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
 }
 
-val appDataDir = System.getenv("APPDATA") ?: (System.getProperty("user.home") + "/AppData/Roaming")
-val hytaleServerJar = file("$appDataDir/Hytale/install/release/package/game/latest/Server/HytaleServer.jar")
+val appDataDir = System.getenv("APPDATA")
+    ?: (System.getProperty("user.home") + "/AppData/Roaming")
+
+val hytaleServerJar =
+    file("$appDataDir/Hytale/install/release/package/game/latest/Server/HytaleServer.jar")
 
 if (!hytaleServerJar.exists()) {
     throw GradleException("Can't found HytaleServer.jar in: $hytaleServerJar")
@@ -50,7 +54,8 @@ tasks.test {
 }
 
 tasks.shadowJar {
-    archiveBaseName = "ReactorSDK"
+    archiveBaseName.set("reactor-sdk")
+    archiveClassifier.set("")
 }
 
 allprojects {
@@ -63,5 +68,30 @@ allprojects {
 
     configure<JavaPluginExtension> {
         toolchain.languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            artifactId = "reactor-sdk"
+            version = project.version.toString()
+
+            artifact(tasks.shadowJar)
+
+            pom {
+                name.set("Reactor SDK")
+                description.set("Reactor public SDK for Hytale plugins")
+                url.set("https://github.com/Reactor-Hytale/ReactorSDK")
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPages"
+            url = uri("${rootProject.buildDir}/repo")
+        }
     }
 }
