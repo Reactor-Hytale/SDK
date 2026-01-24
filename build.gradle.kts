@@ -1,24 +1,25 @@
 plugins {
     id("java")
     id("com.gradleup.shadow") version "9.3.0"
-    id("maven-publish")
 }
 
 group = "codes.reactor"
-version = "1.1.0"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://repo.reactor.codes/")
+        name = "Reactor Repository"
+    }
 }
 
-val appDataDir = System.getenv("APPDATA")
-    ?: (System.getProperty("user.home") + "/AppData/Roaming")
-
-val hytaleServerJar =
-    file("$appDataDir/Hytale/install/release/package/game/latest/Server/HytaleServer.jar")
-
-if (!hytaleServerJar.exists()) {
-    throw GradleException("Can't found HytaleServer.jar in: $hytaleServerJar")
+repositories {
+    mavenCentral()
+    maven {
+        name = "hytale-pre-release"
+        url = uri("https://maven.hytale.com/pre-release")
+    }
 }
 
 dependencies {
@@ -34,28 +35,20 @@ dependencies {
 
     compileOnly("org.jetbrains:annotations:26.0.2-1")
 
-    compileOnly(files(hytaleServerJar))
-    testRuntimeOnly(files(hytaleServerJar))
+    compileOnly("codes.reactor:reactor-sdk:1.1.0")
 
-    implementation("org.snakeyaml:snakeyaml-engine:3.0.1")
-    implementation("org.mongodb:mongodb-driver-sync:5.6.2")
+    compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
+    testRuntimeOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    doFirst {
-        if (!hytaleServerJar.exists()) {
-            throw GradleException("Can't found HytaleServer.jar in: $hytaleServerJar")
-        }
-    }
-}
 
 tasks.test {
     useJUnitPlatform()
 }
 
 tasks.shadowJar {
-    archiveBaseName.set("reactor-sdk")
-    archiveClassifier.set("")
+    archiveBaseName.set("${rootProject.name}")
+    archiveClassifier.set("") // remove "all" suffix
 }
 
 allprojects {
@@ -68,30 +61,5 @@ allprojects {
 
     configure<JavaPluginExtension> {
         toolchain.languageVersion.set(JavaLanguageVersion.of(25))
-    }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = project.group.toString()
-            artifactId = "reactor-sdk"
-            version = project.version.toString()
-
-            artifact(tasks.shadowJar)
-
-            pom {
-                name.set("Reactor SDK")
-                description.set("Reactor public SDK for Hytale plugins")
-                url.set("https://github.com/Reactor-Hytale/ReactorSDK")
-            }
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPages"
-            url = uri("${rootProject.buildDir}/repo")
-        }
     }
 }
