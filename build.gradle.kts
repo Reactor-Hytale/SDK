@@ -8,10 +8,6 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://repo.reactor.codes/")
-        name = "Reactor Repository"
-    }
 }
 
 repositories {
@@ -35,10 +31,11 @@ dependencies {
 
     compileOnly("org.jetbrains:annotations:26.0.2-1")
 
-    compileOnly("codes.reactor:reactor-sdk:1.1.0")
+    implementation("org.snakeyaml:snakeyaml-engine:3.0.1")
+    implementation("org.mongodb:mongodb-driver-sync:5.6.2")
 
-    compileOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
-    testRuntimeOnly("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
+    compileOnly("com.hypixel.hytale:Server:2026.01.23-6e2d4fc36")
+    testRuntimeOnly("com.hypixel.hytale:Server:2026.01.23-6e2d4fc36")
 }
 
 
