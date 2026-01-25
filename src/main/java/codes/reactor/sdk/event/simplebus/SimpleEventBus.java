@@ -103,5 +103,6 @@ public final class SimpleEventBus implements EventBus {
     @Override
     public void clear() {
         eventsStorage.clear();
+        owners.clear();
     }
 }

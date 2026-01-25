@@ -2,10 +2,16 @@ package codes.reactor.sdk.event.simplebus;
 
 import codes.reactor.sdk.event.ListenerPhase;
 
-final class EventStorage {
+import java.util.Arrays;
+
+public final class EventStorage {
     private static final int LISTENER_PHASES_SIZE = ListenerPhase.values().length;
 
     private final ListenerStorage[] listenersPerPhase = new ListenerStorage[LISTENER_PHASES_SIZE];
+
+    public void clear() {
+        Arrays.fill(listenersPerPhase, null);
+    }
 
     public void remove(final RegisteredListener listener) {
         final int ordinal = listener.phase().ordinal();

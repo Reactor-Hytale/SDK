@@ -2,6 +2,7 @@ package codes.reactor.sdk.event.executor;
 
 import java.util.function.Consumer;
 
+import com.hypixel.hytale.event.ICancellable;
 import lombok.RequiredArgsConstructor;
 import codes.reactor.sdk.event.EventExecutor;
 import codes.reactor.sdk.event.special.Cancellable;
@@ -14,6 +15,9 @@ public final class ListenerConsumerExecutor<T> implements EventExecutor {
     @SuppressWarnings("unchecked")
     public void execute(final Object event) {
         if (event instanceof Cancellable cancellable && cancellable.isCancelled()) {
+            return;
+        }
+        if (event instanceof ICancellable cancellable && cancellable.isCancelled()) {
             return;
         }
         consumer.accept((T)event);

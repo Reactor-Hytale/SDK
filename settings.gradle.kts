@@ -1,1 +1,1 @@
-rootProject.name = "sdk"
+rootProject.name = "reactor-sdk"
